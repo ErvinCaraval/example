@@ -1,5 +1,15 @@
 # auction_app/tests/test_views.py
 
+
+import os
+from django.conf import settings
+
+# Configurar las variables de entorno necesarias
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'drf.settings')
+
+# Configurar la configuración de Django
+settings.configure()
+
 import json
 from rest_framework.test import APIClient
 import pytest
@@ -129,5 +139,3 @@ def test_artwork_delete(api_client, user):
     response = api_client.delete(url)
     assert response.status_code == 204
     assert not Artwork.objects.filter(pk=artwork.pk).exists()
-
-# Similar tests for CustomerViewSet, BidViewSet, and AdminViewSet...
