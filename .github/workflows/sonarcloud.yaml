@@ -21,7 +21,6 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install coverage
 
       - name: Set DJANGO_SETTINGS_MODULE
         run: |

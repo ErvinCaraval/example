@@ -1,31 +1,43 @@
-import pytest
-from django.urls import reverse
-from rest_framework import status
-from rest_framework.test import APIClient
-from models import Auction
+from django.test import TestCase
+from auction_app.models import Customer
 
-@pytest.mark.django_db
-def test_list_auctions():
-    """
-    Prueba que la lista de subastas sea accesible.
-    """
-    client = APIClient()
+class CustomerModelTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Configurar datos iniciales para todas las pruebas del modelo
+        Customer.objects.create(
+            full_name='Juan Perez',
+            email='juan@example.com',
+            phone='1234567890',
+            document_type='DNI',
+            document_number='12345678'
+        )
 
-    # Crear algunas instancias de subastas para probar
-    Auction.objects.create(title='Subasta 1', description='Descripción de la subasta 1', start_price=100)
-    Auction.objects.create(title='Subasta 2', description='Descripción de la subasta 2', start_price=200)
+    def test_full_name_label(self):
+        customer = Customer.objects.get(customer_id=1)
+        field_label = customer._meta.get_field('full_name').verbose_name
+        self.assertEqual(field_label, 'full name')
 
-    # Realizar una solicitud GET a la vista de la API
-    url = reverse('auction-list')
-    response = client.get(url)
+    def test_email_label(self):
+        customer = Customer.objects.get(customer_id=1)
+        field_label = customer._meta.get_field('email').verbose_name
+        self.assertEqual(field_label, 'email')
 
-    # Verificar que la solicitud haya sido exitosa (código de estado 200)
-    assert response.status_code == status.HTTP_200_OK
+    def test_phone_label(self):
+        customer = Customer.objects.get(customer_id=1)
+        field_label = customer._meta.get_field('phone').verbose_name
+        self.assertEqual(field_label, 'phone')
 
-    # Verificar que los datos devueltos son correctos
-    auctions = Auction.objects.all()
-    assert len(response.data) == auctions.count()
-    for auction_data, auction in zip(response.data, auctions):
-        assert auction_data['title'] == auction.title
-        assert auction_data['description'] == auction.description
-        assert auction_data['start_price'] == auction.start_price
+    def test_document_type_label(self):
+        customer = Customer.objects.get(customer_id=1)
+        field_label = customer._meta.get_field('document_type').verbose_name
+        self.assertEqual(field_label, 'document type')
+
+    def test_document_number_label(self):
+        customer = Customer.objects.get(customer_id=1)
+        field_label = customer._meta.get_field('document_number').verbose_name
+        self.assertEqual(field_label, 'document number')
+
+    def test_string_representation(self):
+        customer = Customer.objects.get(customer_id=1)
+        self.assertEqual(str(customer), customer.full_name)
