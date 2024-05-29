@@ -25,7 +25,7 @@ jobs:
 
       - name: Set DJANGO_SETTINGS_MODULE
         run: |
-          export DJANGO_SETTINGS_MODULE=drf.settings
+          export DJANGO_SETTINGS_MODULE=settings
 
       - name: Run tests with coverage
         run: |
