@@ -1,40 +1,70 @@
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
-from .models import Auction, Artwork, Customer, Bid, Admin
-from .serializers import AuctionSerializer, ArtworkSerializer, CustomerSerializer, BidSerializer, AdminSerializer
-from .permissions import IsAdminUser, IsCustomerOrReadOnly
+import unittest
+from unittest.mock import Mock
+from rest_framework.test import APIRequestFactory
+from .views import AuctionViewSet, ArtworkViewSet, CustomerViewSet, BidViewSet, AdminViewSet
 
-class AuctionViewSet(viewsets.ModelViewSet):
-    queryset = Auction.objects.all()
-    serializer_class = AuctionSerializer
-    permission_classes = [IsAdminUser]
+class TestAuctionViewSet(unittest.TestCase):
+    def setUp(self):
+        self.view = AuctionViewSet()
+        self.view.queryset = Mock()
+        self.view.serializer_class = Mock()
 
-class ArtworkViewSet(viewsets.ModelViewSet):
-    queryset = Artwork.objects.all()
-    serializer_class = ArtworkSerializer
-    permission_classes = [IsAdminUser]
+    def test_queryset(self):
+        self.view.queryset.all.assert_called_once()
 
-class CustomerViewSet(viewsets.ModelViewSet):
-    queryset = Customer.objects.all()
-    serializer_class = CustomerSerializer
-    permission_classes = [IsAuthenticated, IsCustomerOrReadOnly]
+class TestArtworkViewSet(unittest.TestCase):
+    def setUp(self):
+        self.view = ArtworkViewSet()
+        self.view.queryset = Mock()
+        self.view.serializer_class = Mock()
 
-    def get_queryset(self):
-        if self.request.user.is_staff:
-            return Customer.objects.all()
-        return Customer.objects.filter(id=self.request.user.id)
+    def test_queryset(self):
+        self.view.queryset.all.assert_called_once()
 
-class BidViewSet(viewsets.ModelViewSet):
-    queryset = Bid.objects.all()
-    serializer_class = BidSerializer
-    permission_classes = [IsAuthenticated, IsCustomerOrReadOnly]
+class TestCustomerViewSet(unittest.TestCase):
+    def setUp(self):
+        self.view = CustomerViewSet()
+        self.view.queryset = Mock()
+        self.view.serializer_class = Mock()
+        self.request = APIRequestFactory().get('/')
+        self.request.user = Mock(is_staff=False, id=1)
 
-    def get_queryset(self):
-        if self.request.user.is_staff:
-            return Bid.objects.all()
-        return Bid.objects.filter(customer=self.request.user)
+    def test_get_queryset_staff(self):
+        self.request.user.is_staff = True
+        queryset = self.view.get_queryset()
+        self.view.queryset.all.assert_called_once()
 
-class AdminViewSet(viewsets.ModelViewSet):
-    queryset = Admin.objects.all()
-    serializer_class = AdminSerializer
-    permission_classes = [IsAdminUser]
+    def test_get_queryset_non_staff(self):
+        queryset = self.view.get_queryset()
+        self.view.queryset.filter.assert_called_once_with(id=1)
+
+class TestBidViewSet(unittest.TestCase):
+    def setUp(self):
+        self.view = BidViewSet()
+        self.view.queryset = Mock()
+        self.view.serializer_class = Mock()
+        self.request = APIRequestFactory().get('/')
+        self.request.user = Mock(is_staff=False)
+
+    def test_get_queryset_staff(self):
+        self.request.user.is_staff = True
+        queryset = self.view.get_queryset()
+        self.view.queryset.all.assert_called_once()
+
+    def test_get_queryset_non_staff(self):
+        self.request.user.is_staff = False
+        self.request.user.id = 1
+        queryset = self.view.get_queryset()
+        self.view.queryset.filter.assert_called_once_with(customer=1)
+
+class TestAdminViewSet(unittest.TestCase):
+    def setUp(self):
+        self.view = AdminViewSet()
+        self.view.queryset = Mock()
+        self.view.serializer_class = Mock()
+
+    def test_queryset(self):
+        self.view.queryset.all.assert_called_once()
+
+if __name__ == '__main__':
+    unittest.main()
