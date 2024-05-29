@@ -1,4 +1,3 @@
-
 name: SonarCloud
 
 on:
@@ -23,6 +22,10 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install coverage
+
+      - name: Set DJANGO_SETTINGS_MODULE
+        run: |
+          export DJANGO_SETTINGS_MODULE=settings
 
       - name: Run tests with coverage
         run: |
