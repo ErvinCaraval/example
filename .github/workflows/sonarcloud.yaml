@@ -23,11 +23,11 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install coverage
+          pip install coverage hypothesis
 
       - name: Run tests with coverage and generate report
         run: |
-          coverage run --source=. views.py
+          coverage run -m hypothesis examples.py
           mkdir -p coverage-reports
           coverage xml -o coverage-reports/coverage.xml
 
