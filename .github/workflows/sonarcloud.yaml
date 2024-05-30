@@ -15,10 +15,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - name: Set up Docker Compose
+        uses: docker/compose-action@v2
         with:
-          python-version: '3.12.3'
+          compose-file: docker-compose.yml
+
+      - name: Start Docker services
+        run: docker-compose up -d
+
+      - name: Wait for services to be ready
+        run: |
+          docker-compose exec web sh -c "python manage.py check"
+          docker-compose exec db sh -c "pg_isready -h localhost -U postgres"
 
       - name: Install dependencies
         run: |
@@ -27,9 +35,9 @@ jobs:
 
       - name: Run tests with coverage and generate report
         run: |
-          coverage run --source=. -m pytest -rs
-          mkdir -p coverage-reports
-          coverage xml -o coverage-reports/coverage.xml
+          docker-compose exec web sh -c "coverage run --source=. -m pytest -rs"
+          docker-compose exec web sh -c "mkdir -p coverage-reports"
+          docker-compose exec web sh -c "coverage xml -o coverage-reports/coverage.xml"
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2.1.0
