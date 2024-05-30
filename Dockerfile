@@ -5,7 +5,7 @@ FROM python:3.9-alpine3.17
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Crear un usuario no root y establecer permisos de trabajo
+# Crear un usuario no root y establecer permisos de trabaj
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # Establece el directorio de trabajo en /code
