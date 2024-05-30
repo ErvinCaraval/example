@@ -18,11 +18,10 @@ jobs:
         with:
           python-version: '3.9'
 
-      # Inicializar contenedores
-      - name: Start containers
-        run: docker-compose -f docker-compose.yml up --build -d
-
-     
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
       # Ejecutar pruebas y cobertura
       - name: Run tests and coverage
