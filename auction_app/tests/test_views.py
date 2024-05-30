@@ -2,14 +2,7 @@ from django.test import TestCase
 from auction_app.models import Customer
 
 
-import os
 
-# Imprimir el valor de cada variable de entorno
-print("DB_NAME:", os.environ.get('DB_NAME'))
-print("DB_USER:", os.environ.get('DB_USER'))
-print("DB_PASSWORD:", os.environ.get('DB_PASSWORD'))
-print("DB_HOST:", os.environ.get('DB_HOST'))
-print("DB_PORT:", os.environ.get('DB_PORT'))
 
 class CustomerModelTest(TestCase):
     @classmethod
