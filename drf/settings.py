@@ -99,12 +99,13 @@ WSGI_APPLICATION = 'drf.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'projecto',
-        'USER': 'postgres',
-        'PASSWORD': 'Ec94',
-        'HOST': 'db',
-        'PORT': '90',  # Puedes dejarlo vacío si estás usando el puerto por defecto
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
     },
+  
 }
 
 

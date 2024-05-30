@@ -18,6 +18,14 @@ jobs:
         with:
           python-version: '3.9'
 
+      # Inicializar contenedores
+      - name: Start containers
+        run: docker-compose -f docker-compose.yml up --build -d
+
+      # Esperar a que los contenedores estén listos (ajustar según sea necesario)
+      - name: Wait for containers to be ready
+        run: docker-compose -f docker-compose.yml exec -T db sh -c 'while !</dev/tcp/db/5432; do sleep 1; done;'
+
       - name: Install dependencies
         run: pip install -r requirements.txt
 
