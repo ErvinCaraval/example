@@ -15,11 +15,10 @@ jobs:
         image: docker/compose:1.29.2
         env:
           DOCKER_COMPOSE_VERSION: 1.29.2
-        options: --privileged
+        options: --privileged --network backend
         ports:
           - 5433:5432 # Exponer el puerto de la base de datos para las pruebas
           - 90:80     # Exponer el puerto de pgadmin
-        options: --network backend
         volumes:
           - .:/code   # Montar el directorio actual como volumen en el contenedor
         command: up --build # Comando para iniciar los servicios
