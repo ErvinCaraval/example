@@ -22,11 +22,11 @@ jobs:
           python-version: '3.9'
 
       - name: Install dependencies
-        run: docker-compose exec web pip install -r requirements.txt
+        run: docker-compose exec web pip install coverage
 
       - name: Run tests and coverage
         run: |
-          docker-compose exec web coverage run manage.py test
+          docker-compose exec web /path/to/coverage run --source='.' manage.py test
           
           
       - name: SonarCloud Scan
