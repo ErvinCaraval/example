@@ -9,13 +9,6 @@ jobs:
   sonarcloud:
     runs-on: ubuntu-latest
 
-    services:
-      web:
-        image: ervincaravaliibarra/galeria-6:latest # Reemplaza esto con la imagen de tu aplicación web
-        options: --name web
-        ports:
-          - 8000:8000  # Ajusta según el puerto en el que se ejecute tu aplicación web
-
     steps:
       - name: Check out code
         uses: actions/checkout@v3
@@ -29,11 +22,12 @@ jobs:
           python-version: '3.9'
 
       - name: Install dependencies
-        run: docker-compose exec web pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
       - name: Run tests and coverage
         run: |
-          docker-compose exec web coverage run --source='.' manage.py test
+          coverage run manage.py test"
+          
           
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2

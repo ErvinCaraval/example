@@ -1,65 +1,42 @@
-version: '3'
+name: SonarCloud
 
-services:
-  web:
-    build: 
-      context: .
-      dockerfile: Dockerfile
-    image: ervincaravaliibarra/galeria-6:latest
-    restart: always
-    command: sh -c "sleep 10 && python manage.py runserver 0.0.0.0:8000"
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/code
-    depends_on:
-      - db
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-    stdin_open: true
-    tty: true
-    networks:
-      - backend
+on:
+  pull_request:
+    branches:
+      - main
 
-  db:
-    build:
-      context: .
-      dockerfile: Dockerfile.db
-    image: ervincaravaliibarra/bdgaleria-6:latest
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    ports:
-      - "5433:5432"
-    volumes:
-      - db_data_volume:/var/lib/postgresql/data
-    networks:
-      - backend
+jobs:
+  sonarcloud:
+    runs-on: ubuntu-latest
 
-  pgadmin:
-    build:
-      context: .
-      dockerfile: Dockerfile.pgadmin
-    image: ervincaravaliibarra/pgadmin-galeria-6:latest
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-    ports:
-      - "90:80"
-    depends_on:
-      - db
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-    networks:
-      - backend
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
 
-volumes:
-  db_data_volume:
-  pgadmin_data:
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
 
-networks:
-  backend:
+      - name: Start Docker Compose services
+        run: docker-compose up -d
+
+      - name: Print .env file content
+        run: cat .env
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: docker-compose exec web pip install -r requirements.txt
+
+      - name: Run tests and coverage
+        run: |
+          docker-compose exec web coverage run --source='.' manage.py test
+          
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
