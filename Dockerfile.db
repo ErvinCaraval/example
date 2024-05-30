@@ -6,6 +6,3 @@ FROM postgres:16-alpine3.17
 COPY .env /usr/src/app/.env
 
 # Establecer variables de entorno para la base de datos
-ENV POSTGRES_DB=$DB_NAME
-ENV POSTGRES_USER=$DB_USER
-ENV POSTGRES_PASSWORD=$DB_PASSWORD
