@@ -27,7 +27,7 @@ jobs:
       - name: Run tests and coverage
         run: |
           pip install coverage
-          coverage run --source='.' manage.py test
+          docker-compose exec web coverage run --source='.' manage.py test
 
       # Escanear con SonarCloud
       - name: SonarCloud Scan
