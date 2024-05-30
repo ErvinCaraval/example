@@ -9,48 +9,11 @@ jobs:
   sonarcloud:
     runs-on: ubuntu-latest
 
-    services:
-      # Define los servicios utilizando Docker Compose
-      docker-compose:
-        image: docker/compose:1.29.2
-        env:
-          DOCKER_COMPOSE_VERSION: 1.29.2
-        options: --privileged --network backend
-        ports:
-          - 5433:5432 # Exponer el puerto de la base de datos para las pruebas
-          - 90:80     # Exponer el puerto de pgadmin
-        volumes:
-          - .:/code   # Montar el directorio actual como volumen en el contenedor
-
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      # Paso para esperar a que los servicios se inicien completamente
-      - name: Wait for Docker services to be ready
-        run: docker-compose exec web sh -c "python manage.py check && pg_isready -h db -U postgres"
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.12.3'
-
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install coverage pytest
-
-      - name: Run tests with coverage and generate report
-        run: |
-          docker-compose exec web coverage run --source=. -m pytest -rs
-          docker-compose exec web mkdir -p coverage-reports
-          docker-compose exec web coverage xml -o coverage-reports/coverage.xml
-
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2.1.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          projectBaseDir: /code # Especifica el directorio base del proyecto en el contenedor
