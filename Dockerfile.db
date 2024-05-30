@@ -10,7 +10,7 @@ WORKDIR /usr/src/app
 # Copiar el archivo .env al contenedor
 COPY .env ./
 
-# Cambiar el propietario y los permisos del archivo .env para que el usuario postgres pueda acceder a él
+# Cambiar el propietario y los permisos del archivo .env para que el usuario pstgres pueda acceder a él
 RUN chown postgres:postgres .env && \
     chmod 600 .env
 
