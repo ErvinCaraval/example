@@ -10,9 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Run tests with coverage
+        run: |
+          coverage run manage.py test
+
+      - name: Generate coverage report
+        run: coverage report -m
+
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2.1.0
         env:
