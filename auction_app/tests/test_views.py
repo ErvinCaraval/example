@@ -1,5 +1,5 @@
 from django.test import TestCase
-from auction_app.models import Customer
+from models import Customer
 
 
 
