@@ -1,9 +1,10 @@
 # Usa la imagen base de pgAdmin 4
-FROM dpage/pgadmin4
+FROM dpage/pgadmin4:6.2
 
 # Copia el archivo .env al contenedor y carga las variables de entorno
 COPY .env /usr/src/app/.env
 
 # Configura las variables de entorno para el correo electrónico y la contraseña predeterminados
-ENV PGADMIN_DEFAULT_EMAIL=$PGADMIN_DEFAULT_EMAIL
-ENV PGADMIN_DEFAULT_PASSWORD=$PGADMIN_DEFAULT_PASSWORD
+
+# Cambiar al usuario no privilegiado
+USER pgadmin

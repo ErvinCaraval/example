@@ -1,11 +1,18 @@
-# Dockerfile para la imagen de la base de datos PostgreSQL
-
+# Usar una versión específica de la imagen de PostgreSQL
 FROM postgres:16-alpine3.17
 
-# Copiar el archivo .env al contenedor y cargar las variables de entorno
-COPY .env /usr/src/app/.env
+# Crear un usuario no privilegiado para la aplicación
+RUN addgroup -S auctiongroup && adduser -S auctionuser -G auctiongroup
 
-# Establecer variables de entorno para la base de datos
-ENV POSTGRES_DB=$DB_NAME
-ENV POSTGRES_USER=$DB_USER
-ENV POSTGRES_PASSWORD=$DB_PASSWORD
+# Establecer el directorio de trabajo
+WORKDIR /usr/src/app
+
+# Copiar el archivo .env al contenedor
+COPY .env ./
+
+# Cambiar el propietario y los permisos del archivo .env para que el usuario postgres pueda acceder a él
+RUN chown postgres:postgres .env && \
+    chmod 600 .env
+
+# Cambiar al usuario no privilegiado
+USER auctionuser
