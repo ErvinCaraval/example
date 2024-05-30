@@ -13,14 +13,6 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
-
-      - name: Start Docker Compose services
-        run: docker-compose up -d
-
       - name: Print .env file content
         run: cat .env
 
@@ -30,13 +22,14 @@ jobs:
           python-version: '3.9'
 
       - name: Install dependencies
-        run: docker-compose exec web pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
       - name: Run tests and coverage
         run: |
-          docker-compose exec web coverage run --source='.' manage.py test
+          coverage run manage.py test"
+          
           
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2
         env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
