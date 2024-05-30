@@ -26,7 +26,7 @@ jobs:
 
       - name: Run tests and coverage
         run: |
-          coverage run auction_app/test_views.py
+          coverage run auction_app/tests/test_views.py
           coverage xml -o coverage.xml
           
       - name: SonarCloud Scan
