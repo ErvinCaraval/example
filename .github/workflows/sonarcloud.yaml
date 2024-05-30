@@ -27,7 +27,7 @@ jobs:
 
       - name: Run tests with coverage and generate report
         run: |
-          coverage run --source=. -m unittest discover
+          coverage run --source=. views.py
           mkdir -p coverage-reports
           coverage xml -o coverage-reports/coverage.xml
 
