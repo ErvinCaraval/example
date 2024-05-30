@@ -26,6 +26,9 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-cov
 
+      - name: Remove colorama tests directory
+        run: rm -rf env/Lib/site-packages/colorama/tests
+
       - name: Run tests with coverage
         run: |
           pytest --cov=. --cov-report=xml
