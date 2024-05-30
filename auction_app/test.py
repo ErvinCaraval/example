@@ -8,7 +8,7 @@ from models import Customer
 class CustomerModelTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        # Configurar datos iniciales para todas las pruebas del modelo
+        # Configurar datos iniciales para todas las pruebas del model
         Customer.objects.create(
             full_name='Juan Perez',
             email='juan@example.com',
