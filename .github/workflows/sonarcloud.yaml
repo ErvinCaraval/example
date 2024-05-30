@@ -26,8 +26,7 @@ jobs:
 
       - name: Run tests and coverage
         run: |
-          docker-compose exec web /path/to/coverage run --source='.' manage.py test
-          
+          docker-compose exec web coverage run --source='.' manage.py test
           
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2
