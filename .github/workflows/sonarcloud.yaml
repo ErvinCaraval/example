@@ -9,45 +9,12 @@ jobs:
   sonarcloud:
     runs-on: ubuntu-latest
 
-    services:
-      web:
-        build: 
-          context: .
-          dockerfile: Dockerfile
-        image: ervincaravaliibarra/galeria-6:latest
-        restart: always
-        command: sh -c "sleep 10 && python manage.py runserver 0.0.0.0:8000"
-        ports:
-          - "8000:8000"
-        volumes:
-          - .:/code
-        depends_on:
-          - db
-        environment:
-          - DB_HOST=${DB_HOST}
-          - DB_NAME=${DB_NAME}
-          - DB_USER=${DB_USER}
-          - DB_PASSWORD=${DB_PASSWORD}
-        stdin_open: true
-        tty: true
-
-      db:
-        build:
-          context: .
-          dockerfile: Dockerfile.db
-        image: ervincaravaliibarra/bdgaleria-6:latest
-        environment:
-          - POSTGRES_DB=${POSTGRES_DB}
-          - POSTGRES_USER=${POSTGRES_USER}
-          - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-        ports:
-          - "5433:5432"
-        volumes:
-          - db_data_volume:/var/lib/postgresql/data
-
     steps:
       - name: Check out code
         uses: actions/checkout@v3
+
+      - name: Print .env file content
+        run: cat .env
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -61,11 +28,8 @@ jobs:
         run: |
           docker-compose run web sh -c "coverage run manage.py test"
           docker-compose run web sh -c "coverage xml -o coverage.xml"
-
+          
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-volumes:
-  db_data_volume:
