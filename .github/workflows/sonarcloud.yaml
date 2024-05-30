@@ -28,7 +28,7 @@ jobs:
 
       - name: Set up Django environment
         run: |
-          export DJANGO_SETTINGS_MODULE=drf.settings
+          export DJANGO_SETTINGS_MODULE=drf/settings
           python manage.py check
 
       - name: Run tests with coverage
