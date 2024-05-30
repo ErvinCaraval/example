@@ -21,7 +21,6 @@ jobs:
           - 90:80     # Exponer el puerto de pgadmin
         volumes:
           - .:/code   # Montar el directorio actual como volumen en el contenedor
-        command: up --build # Comando para iniciar los servicios
 
     steps:
       - name: Check out repository
