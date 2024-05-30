@@ -33,6 +33,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
+          cd auction_app
           pytest test.py --cov=. --cov-report=xml
 
       - name: SonarCloud Scan
