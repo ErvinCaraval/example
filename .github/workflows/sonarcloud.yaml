@@ -19,12 +19,16 @@ jobs:
           python-version: '3.9'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt  # Asegúrate de tener un archivo requirements.txt con tus dependencias
+        run: pip install -r requirements.txt
+
+      - name: Load environment variables
+        run: |
+          export $(cat .env | xargs)
 
       - name: Run tests and coverage
         run: |
-          coverage run manage.py test  # Ejecuta tus pruebas y mide la cobertura con Coverage.py
-          coverage xml -o coverage.xml  # Genera un informe en formato XML para SonarCloud
+          coverage run manage.py test
+          coverage xml -o coverage.xml
           
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2
