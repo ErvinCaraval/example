@@ -26,12 +26,7 @@ jobs:
         with:
           python-version: '3.9'
 
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker.io
-          sudo ln -sf /usr/bin/docker.io /usr/local/bin/docker
-          sudo systemctl start docker
+      
 
       - name: Install dependencies
         run: docker-compose exec web pip install -r requirements.txt
