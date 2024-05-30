@@ -27,8 +27,9 @@ jobs:
 
       - name: Run tests with coverage and generate report
         run: |
-          coverage run --source=. -m pytest
-          
+          coverage run --source=. -m pytest -rs
+          mkdir -p coverage-reports
+          coverage xml -o coverage-reports/coverage.xml
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2.1.0
