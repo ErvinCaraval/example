@@ -28,7 +28,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          pytest --cov=. --cov-report=xml --ignore=env/Lib/site-packages/colorama
+          pytest --cov=. --cov-report=xml
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2.1.0
