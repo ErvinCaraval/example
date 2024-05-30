@@ -21,6 +21,8 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
     stdin_open: true
     tty: true
+    networks:
+      - backend
 
   db:
     build:
@@ -35,6 +37,8 @@ services:
       - "5433:5432"
     volumes:
       - db_data_volume:/var/lib/postgresql/data
+    networks:
+      - backend
 
   pgadmin:
     build:
@@ -50,7 +54,12 @@ services:
       - db
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - backend
 
 volumes:
   db_data_volume:
   pgadmin_data:
+
+networks:
+  backend:
