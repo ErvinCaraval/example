@@ -5,28 +5,17 @@ FROM python:3.9-alpine3.17
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Crear un usuario no root y establecer permisos de trabaj
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-
-# Establece el directorio de trabajo en /code
+# Establece el directorio de trabajo en /cod
 WORKDIR /code
 
-# Copia solo los archivos necesarios para instalar las dependencias
+# Copia todo el contenido del repositorio al directorio de trabajo del contenedor
+COPY . /code/
+
+# Copia el archivo requirements.txt al directorio de trabajo
 COPY requirements.txt /code/
 
 # Instala las dependencias del proyecto especificadas en requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Copia los archivos y directorios específicos del proyecto
-COPY manage.py /code/
-COPY auction_app /code/auction_app
-COPY drf /code/drf
-
-# Cambia la propiedad de los archivos copiados al usuario no root
-RUN chown -R appuser:appgroup /code
-
-# Cambia al usuario no root
-USER appuser
 
 # Expone el puerto 8000 para que pueda ser accesible desde fuera del contenedor
 EXPOSE 8000
