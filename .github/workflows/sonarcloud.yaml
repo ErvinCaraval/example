@@ -32,13 +32,11 @@ jobs:
         run: docker-compose build
 
       - name: Start Docker Compose
-        run: |
-          docker-compose up -d
-          docker-compose exec -T db sh -c 'while !</dev/tcp/db/5432; do sleep 1; done;'
+        run: docker-compose up -d
 
-      - name: Wait for web service to be ready
+      - name: Wait for db service to be ready
         run: |
-          sleep 20  # Esperar 20 segundos para asegurar que el servicio web esté listo
+          docker-compose exec -T db sh -c 'while !</dev/tcp/db/5432; do sleep 1; done;'
 
       - name: Run tests and coverage
         run: |
