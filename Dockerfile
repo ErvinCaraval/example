@@ -14,10 +14,10 @@ COPY requirements.txt /code/
 # Instala las dependencias del proyecto especificadas en requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copia archivos específicos y directorios necesarios para la aplicación
+# Copia los archivos y directorios específicos del proyecto
 COPY manage.py /code/
-COPY myapp /code/myapp
-COPY other_required_dir /code/other_required_dir
+COPY auction_app /code/auction_app
+COPY drf /code/drf
 
 # Expone el puerto 8000 para que pueda ser accesible desde fuera del contenedor
 EXPOSE 8000
