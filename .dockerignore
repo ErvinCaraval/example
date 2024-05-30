@@ -3,7 +3,6 @@
 *.pyo
 *.pyd
 __pycache__/
-.env
 .git
 .gitignore
 .DS_Store
