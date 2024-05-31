@@ -11,13 +11,13 @@ jobs:
 
     services:
       db:
-        image: postgres:latest
+        image: ervincaravaliibarra/bdgaleria-6:latest
         env:
           POSTGRES_DB: projecto
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: Ec94
         ports:
-          - 5432:5432
+          - 5433:5432
 
     steps:
       - uses: actions/checkout@v4
