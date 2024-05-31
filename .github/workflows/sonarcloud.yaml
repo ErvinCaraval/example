@@ -17,7 +17,8 @@ jobs:
         uses: docker/setup-qemu-action@v2
 
       - name: Build and run tests using Docker Compose
-        run: docker-compose -f docker-compose.yml up --build --abort-on-container-exit db web tests
+        run: docker-compose -f docker-compose.yml up --build -d db web tests
+
       - name: Upload coverage report
         uses: actions/upload-artifact@v3
         with:
@@ -27,10 +28,4 @@ jobs:
         uses: sonarsource/sonarcloud-github-action@v2.1.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.projectKey=ErvinCaraval_example
-            -Dsonar.organization=ervincaraval
-            -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-            -Dsonar.python.coverage.reportPaths=coverage.xml
+        

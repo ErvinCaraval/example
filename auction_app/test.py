@@ -2,6 +2,13 @@ from django.test import TestCase
 from django.utils import timezone
 from .models import Auction, Artwork, Customer, Bid, Admin
 from django.core.exceptions import ValidationError
+from rest_framework.test import APIClient, APITestCase
+from rest_framework import status
+from django.contrib.auth.models import User
+from django.urls import reverse
+
+
+
 
 class TestModels(TestCase):
     def setUp(self):
@@ -57,3 +64,126 @@ class TestModels(TestCase):
             auction = Auction.objects.create(auction_name="Invalid Auction", auction_description="Test Description", start_date=timezone.now(), end_date=timezone.now()-timezone.timedelta(days=1))
             auction.clean()
 
+
+
+
+
+
+
+
+
+
+class ViewsetTests(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        
+        # Create admin user
+        self.admin_user = User.objects.create_superuser(username='admin', email='admin@example.com', password='adminpassword')
+        self.client.force_authenticate(user=self.admin_user)
+        
+        # Create a customer
+        self.customer = Customer.objects.create(full_name="John Doe", email="john@example.com", phone="123456789", document_type="ID", document_number="123456789")
+        
+        # Create auction
+        self.auction = Auction.objects.create(auction_name="Test Auction", auction_description="Test Description", start_date=timezone.now(), end_date=timezone.now())
+        
+        # Create artwork
+        self.artwork = Artwork.objects.create(auction=self.auction, title="Test Artwork", artist="Test Artist", year_created=2022, dimensions="10x10", material="Oil on Canvas", genre="Abstract", description="Test Description", minimum_bid=100.00)
+        
+        # Create bid
+        self.bid = Bid.objects.create(auction=self.auction, artwork=self.artwork, customer=self.customer, bid_value=200.00, bid_timestamp=timezone.now())
+
+    def test_auction_list(self):
+        url = reverse('auction-list')  
+        response = self.client.get(url)  
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+    def test_artwork_list(self):
+        url = reverse('artwork-list')
+        response = self.client.get(url)  
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+    def test_customer_list_as_admin(self):
+        url = reverse('customer-list')
+        response = self.client.get(url)  
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+    def test_customer_list_as_customer(self):
+        url = reverse('customer-list')
+        response = self.client.get(url)  
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['full_name'], 'John Doe')
+
+    def test_bid_list_as_admin(self):
+        url = reverse('bid-list')
+        response = self.client.get(url)  
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+    
+    def test_update_auction(self):
+        url = reverse('auction-detail', kwargs={'pk': self.auction.pk})
+        new_data = {
+            'auction_name': 'Updated Auction',
+            'auction_description': 'Updated Description',
+            'start_date': timezone.now(),
+            'end_date': timezone.now() + timezone.timedelta(days=1)
+        }
+        response = self.client.put(url, new_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_auction = Auction.objects.get(pk=self.auction.pk)
+        self.assertEqual(updated_auction.auction_name, 'Updated Auction')
+        self.assertEqual(updated_auction.auction_description, 'Updated Description')
+
+    
+    def test_delete_auction(self):
+        url = reverse('auction-detail', kwargs={'pk': self.auction.pk})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        with self.assertRaises(Auction.DoesNotExist):
+            Auction.objects.get(pk=self.auction.pk)
+
+    
+
+    def test_delete_artwork(self):
+        url = reverse('artwork-detail', kwargs={'pk': self.artwork.pk})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        with self.assertRaises(Artwork.DoesNotExist):
+            Artwork.objects.get(pk=self.artwork.pk)
+
+    def test_update_customer(self):
+        url = reverse('customer-detail', kwargs={'pk': self.customer.pk})
+        new_data = {
+            'full_name': 'Jane Doe',
+            'email': 'jane@example.com',
+            'phone': '987654321',
+            'document_type': 'Passport',
+            'document_number': '987654321'
+        }
+        response = self.client.put(url, new_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_customer = Customer.objects.get(pk=self.customer.pk)
+        self.assertEqual(updated_customer.full_name, 'Jane Doe')
+        self.assertEqual(updated_customer.email, 'jane@example.com')
+
+    def test_delete_customer(self):
+        url = reverse('customer-detail', kwargs={'pk': self.customer.pk})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        with self.assertRaises(Customer.DoesNotExist):
+            Customer.objects.get(pk=self.customer.pk)
+
+    def test_delete_bid(self):
+        url = reverse('bid-detail', kwargs={'pk': self.bid.pk})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        with self.assertRaises(Bid.DoesNotExist):
+            Bid.objects.get(pk=self.bid.pk)
+
+
+
+    
