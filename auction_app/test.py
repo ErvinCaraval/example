@@ -3,6 +3,7 @@ from django.utils import timezone
 from .models import Auction, Artwork, Customer, Bid, Admin
 from django.core.exceptions import ValidationError
 
+
 class TestModels(TestCase):
     def setUp(self):
         self.customer = Customer.objects.create(full_name="John Doe", email="john@example.com", phone="123456789", document_type="ID", document_number="123456789")
@@ -57,3 +58,69 @@ class TestModels(TestCase):
             auction = Auction.objects.create(auction_name="Invalid Auction", auction_description="Test Description", start_date=timezone.now(), end_date=timezone.now()-timezone.timedelta(days=1))
             auction.clean()
 
+
+
+
+from django.urls import reverse
+from django.contrib.auth.models import User
+from rest_framework import status
+from rest_framework.test import APIClient, APITestCase
+from .models import Auction, Artwork, Customer, Bid
+from django.utils import timezone
+
+class ViewsetTests(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        
+        # Create admin user
+        self.admin_user = User.objects.create_superuser(username='admin', email='admin@example.com', password='adminpassword')
+        self.client.force_authenticate(user=self.admin_user)
+        
+        # Create a customer
+        self.customer = Customer.objects.create(full_name="John Doe", email="john@example.com", phone="123456789", document_type="ID", document_number="123456789")
+        
+        # Create auction
+        self.auction = Auction.objects.create(auction_name="Test Auction", auction_description="Test Description", start_date=timezone.now(), end_date=timezone.now())
+        
+        # Create artwork
+        self.artwork = Artwork.objects.create(auction=self.auction, title="Test Artwork", artist="Test Artist", year_created=2022, dimensions="10x10", material="Oil on Canvas", genre="Abstract", description="Test Description", minimum_bid=100.00)
+        
+        # Create bid
+        self.bid = Bid.objects.create(auction=self.auction, artwork=self.artwork, customer=self.customer, bid_value=200.00, bid_timestamp=timezone.now())
+
+    def test_auction_list(self):
+        url = reverse('auction-list')  
+        response = self.client.get(url)  
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+    def test_artwork_list(self):
+        url = reverse('artwork-list')
+        response = self.client.get(url)  
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+    def test_customer_list_as_admin(self):
+        url = reverse('customer-list')
+        response = self.client.get(url)  
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+    def test_customer_list_as_customer(self):
+        url = reverse('customer-list')
+        response = self.client.get(url)  
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['full_name'], 'John Doe')
+
+    def test_bid_list_as_admin(self):
+        url = reverse('bid-list')
+        response = self.client.get(url)  
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+    def test_bid_list_as_customer(self):
+        url = reverse('bid-list')
+        response = self.client.get(url) 
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
