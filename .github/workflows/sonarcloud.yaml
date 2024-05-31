@@ -16,10 +16,8 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
-      - name: Build and push Docker image
-        run: docker-compose -f docker-compose.yml build
-      - name: Run tests in Docker
-        run: docker-compose -f docker-compose.yml run tests
+      - name: Build and run tests using Docker Compose
+        run: docker-compose -f docker-compose.yml up --build --abort-on-container-exit tests
       - name: Upload coverage report
         uses: actions/upload-artifact@v3
         with:
