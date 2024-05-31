@@ -1,0 +1,24 @@
+name: Trigger Workflows
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  trigger-sonarcloud:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger SonarCloud Workflow
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: sonarcloud.yaml
+
+  trigger-dockerhub:
+    needs: trigger-sonarcloud
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger DockerHub Workflow
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: dockerhub.yaml
