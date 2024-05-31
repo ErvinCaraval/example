@@ -8,18 +8,25 @@ on:
 
 jobs:
   build_and_push:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Build and push images
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      # Descarga el archivo de estado compartido desde el flujo de trabajo anterior
+      - name: Download completion flag
+        uses: actions/download-artifact@v2
+        with:
+          name: analysis-completed
+          path: .
+
+      # Comprueba si el archivo de estado existe
+      - name: Verify completion flag
         run: |
-          docker-compose build
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-          docker-compose push
+          if [ ! -f analysis_completed.txt ]; then
+            echo "SonarCloud analysis not completed. Exiting..."
+            exit 1
+          fi
+
+      # Tus pasos para construir y publicar imágenes Docker aquí...
