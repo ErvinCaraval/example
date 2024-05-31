@@ -4,7 +4,7 @@ FROM python:3.9-alpine3.17
 # Crear un usuario no privilegiado para la aplicación
 RUN addgroup -S auctiongroup && adduser -S auctionuser -G auctiongroup
 
-# Establecer variables de entorno para Python
+# Establecer variables de entorno para Pytho
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
