@@ -7,15 +7,13 @@ services:
       dockerfile: Dockerfile
     image: ervincaravaliibarra/galeria-6:latest
     restart: always
-    command: sh -c "sleep 10 && python manage.py runserver 0.0.0.0:8000"
+    command: sh -c "sleep 20 && python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
     volumes:
       - .:/code
-    depends_on:
-      - db
     environment:
-      - DB_HOST=${DB_HOST}
+      - DB_HOST=db
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
@@ -46,8 +44,8 @@ services:
       dockerfile: Dockerfile.pgadmin
     image: ervincaravaliibarra/pgadmin-galeria-6:latest
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      - PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     ports:
       - "90:80"
     depends_on:
@@ -61,13 +59,13 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-    command: sh -c "sleep 10 && coverage run manage.py test && coverage xml"
+    command: sh -c "sleep 20 && coverage run manage.py test && coverage xml"
     volumes:
       - .:/code
     depends_on:
       - db
     environment:
-      - DB_HOST=${DB_HOST}
+      - DB_HOST=db
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
