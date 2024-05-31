@@ -1,4 +1,4 @@
-name: CI
+name: SonarCloud CI
 
 on:
   pull_request:
@@ -29,12 +29,3 @@ jobs:
         uses: sonarsource/sonarcloud-github-action@v2.1.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      - name: Create completion marker
-        run: echo "CI completed" > ci_completed.txt
-
-      - name: Upload completion marker
-        uses: actions/upload-artifact@v3
-        with:
-          name: ci-completed
-          path: ci_completed.txt

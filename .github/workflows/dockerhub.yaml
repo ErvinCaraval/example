@@ -2,7 +2,7 @@ name: DockerHub
 
 on:
   workflow_run:
-    workflows: ["CI"]
+    workflows: ["SonarCloud CI"]
     types:
       - completed
 
@@ -14,19 +14,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Download completion marker
-        uses: actions/download-artifact@v3
-        with:
-          name: ci-completed
-          path: .
-
-      - name: Verify completion marker
-        run: |
-          if [ ! -f ci_completed.txt ]; then
-            echo "CI workflow not completed successfully. Exiting..."
-            exit 1
-          fi
 
       - name: Build and push images
         env:
