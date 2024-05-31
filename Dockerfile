@@ -21,7 +21,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN chown -R auctionuser:auctiongroup /code
 
 # Cambia al usuario no privilegiado
-USER postgres
+
 
 # Copia el resto del código del proyecto
 COPY . /code/
