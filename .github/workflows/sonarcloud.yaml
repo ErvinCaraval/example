@@ -1,7 +1,6 @@
 name: CI
 
 on:
-  workflow_dispatch:
   pull_request:
     branches:
       - main
@@ -25,7 +24,17 @@ jobs:
         with:
           name: coverage-report
           path: ./coverage.xml
+
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2.1.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Create completion marker
+        run: echo "CI completed" > ci_completed.txt
+
+      - name: Upload completion marker
+        uses: actions/upload-artifact@v3
+        with:
+          name: ci-completed
+          path: ci_completed.txt

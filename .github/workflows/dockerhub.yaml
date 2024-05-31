@@ -1,18 +1,32 @@
 name: DockerHub
 
 on:
-  workflow_dispatch:
-  pull_request:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
 
 jobs:
   build_and_push:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Download completion marker
+        uses: actions/download-artifact@v3
+        with:
+          name: ci-completed
+          path: .
+
+      - name: Verify completion marker
+        run: |
+          if [ ! -f ci_completed.txt ]; then
+            echo "CI workflow not completed successfully. Exiting..."
+            exit 1
+          fi
 
       - name: Build and push images
         env:
