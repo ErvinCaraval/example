@@ -123,5 +123,67 @@ class ViewsetTests(APITestCase):
         response = self.client.get(url)  
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
+    
+    def test_update_auction(self):
+        url = reverse('auction-detail', kwargs={'pk': self.auction.pk})
+        new_data = {
+            'auction_name': 'Updated Auction',
+            'auction_description': 'Updated Description',
+            'start_date': timezone.now(),
+            'end_date': timezone.now() + timezone.timedelta(days=1)
+        }
+        response = self.client.put(url, new_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_auction = Auction.objects.get(pk=self.auction.pk)
+        self.assertEqual(updated_auction.auction_name, 'Updated Auction')
+        self.assertEqual(updated_auction.auction_description, 'Updated Description')
+
+    
+    def test_delete_auction(self):
+        url = reverse('auction-detail', kwargs={'pk': self.auction.pk})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        with self.assertRaises(Auction.DoesNotExist):
+            Auction.objects.get(pk=self.auction.pk)
+
+    
+
+    def test_delete_artwork(self):
+        url = reverse('artwork-detail', kwargs={'pk': self.artwork.pk})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        with self.assertRaises(Artwork.DoesNotExist):
+            Artwork.objects.get(pk=self.artwork.pk)
+
+    def test_update_customer(self):
+        url = reverse('customer-detail', kwargs={'pk': self.customer.pk})
+        new_data = {
+            'full_name': 'Jane Doe',
+            'email': 'jane@example.com',
+            'phone': '987654321',
+            'document_type': 'Passport',
+            'document_number': '987654321'
+        }
+        response = self.client.put(url, new_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_customer = Customer.objects.get(pk=self.customer.pk)
+        self.assertEqual(updated_customer.full_name, 'Jane Doe')
+        self.assertEqual(updated_customer.email, 'jane@example.com')
+
+    def test_delete_customer(self):
+        url = reverse('customer-detail', kwargs={'pk': self.customer.pk})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        with self.assertRaises(Customer.DoesNotExist):
+            Customer.objects.get(pk=self.customer.pk)
+
+    def test_delete_bid(self):
+        url = reverse('bid-detail', kwargs={'pk': self.bid.pk})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        with self.assertRaises(Bid.DoesNotExist):
+            Bid.objects.get(pk=self.bid.pk)
+
+
 
     
