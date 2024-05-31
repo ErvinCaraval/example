@@ -9,16 +9,6 @@ jobs:
   test-and-analyze:
     runs-on: ubuntu-latest
 
-    services:
-      db:
-        image: ervincaravaliibarra/bdgaleria-6:latest
-        env:
-          POSTGRES_DB: projecto
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: Ec94
-        ports:
-          - 5433:5432
-
     steps:
       - uses: actions/checkout@v4
       - name: Set up Docker Buildx
@@ -29,7 +19,8 @@ jobs:
       - name: Build and push Docker image
         run: docker-compose -f docker-compose.yml build
       - name: Run tests in Docker
-        run: docker-compose -f docker-compose.yml run tests
+        run: docker-compose exec web tests
+
       - name: Upload coverage report
         uses: actions/upload-artifact@v3
         with:
@@ -46,84 +37,3 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
             -Dsonar.python.coverage.reportPaths=coverage.xml
-
-services:
-  web:
-    build: 
-      context: .
-      dockerfile: Dockerfile
-    image: ervincaravaliibarra/galeria-6:latest
-    restart: always
-    command: sh -c "sleep 10 && python manage.py runserver 0.0.0.0:8000"
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/code
-    depends_on:
-      - db
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-    stdin_open: true
-    tty: true
-    networks:
-      - backend
-
-  db:
-    build:
-      context: .
-      dockerfile: Dockerfile.db
-    image: ervincaravaliibarra/bdgaleria-6:latest
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    ports:
-      - "5433:5432"
-    volumes:
-      - db_data_volume:/var/lib/postgresql/data
-    networks:
-      - backend
-
-  pgadmin:
-    build:
-      context: .
-      dockerfile: Dockerfile.pgadmin
-    image: ervincaravaliibarra/pgadmin-galeria-6:latest
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-    ports:
-      - "90:80"
-    depends_on:
-      - db
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-    networks:
-      - backend
-
-  tests:
-    build: 
-      context: .
-      dockerfile: Dockerfile
-    command: sh -c "sleep 10 && coverage run manage.py test && coverage xml"
-    volumes:
-      - .:/code
-    depends_on:
-      - db
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-    networks:
-      - backend
-
-volumes:
-  db_data_volume:
-  pgadmin_data:
-
-networks:
-  backend:
