@@ -1,4 +1,4 @@
-name: SonarCloud CI
+name: CI and DockerHub
 
 on:
   pull_request:
@@ -10,18 +10,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Build and run tests using Docker Compose
+        run: docker-compose -f docker-compose.yml up --build -d db web tests
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: ./coverage.xml
+
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@v2.1.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  build_and_push:
+    needs: test-and-analyze
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
-      # Tus pasos para pruebas y análisis aquí...
-
-      - name: Set flag indicating completion
-        run: echo "SonarCloud analysis completed" > analysis_completed.txt
-        # Guarda el archivo de estado como un artefacto
-        # para que el siguiente flujo de trabajo pueda acceder a él.
-        # Esto lo hace disponible para el siguiente flujo de trabajo.
-        - name: Upload completion flag
-          uses: actions/upload-artifact@v2
-          with:
-            name: analysis-completed
-            path: analysis_completed.txt
+      - name: Build and push images
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          docker-compose build
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+          docker-compose push
