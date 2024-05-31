@@ -16,7 +16,6 @@ COPY requirements.txt /code/
 
 # Instala las dependencias del proyecto especificadas en requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install coverage
 
 # Cambia la propiedad del directorio de trabajo al usuario no privilegiado
 RUN chown -R auctionuser:auctiongroup /code
