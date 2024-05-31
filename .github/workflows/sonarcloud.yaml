@@ -21,58 +21,15 @@ jobs:
 
       pgadmin:
         image: ervincaravaliibarra/pgadmin-galeria-6:latest
-        environment:
-          PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-          PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
         ports:
           - 90:80
-        depends_on:
-          - db
-
-      web:
-        build: 
-          context: .
-          dockerfile: Dockerfile
-        image: ervincaravaliibarra/galeria-6:latest
-        restart: always
-        command: sh -c "sleep 10 && python manage.py runserver 0.0.0.0:8000"
-        ports:
-          - "8000:8000"
-        volumes:
-          - .:/code
-        depends_on:
-          - db
-        environment:
-          - DB_HOST=${DB_HOST}
-          - DB_NAME=${DB_NAME}
-          - DB_USER=${DB_USER}
-          - DB_PASSWORD=${DB_PASSWORD}
-        stdin_open: true
-        tty: true
-        networks:
-          - backend
-
-      tests:
-        build: 
-          context: .
-          dockerfile: Dockerfile
-        command: sh -c "sleep 10 && coverage run manage.py test && coverage xml"
-        volumes:
-          - .:/code
-        depends_on:
-          - db
-        environment:
-          - DB_HOST=${DB_HOST}
-          - DB_NAME=${DB_NAME}
-          - DB_USER=${DB_USER}
-          - DB_PASSWORD=${DB_PASSWORD}
-        networks:
-          - backend
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      # Configurar otros servicios si son necesarios
 
       - name: Install dependencies
         run: |
