@@ -9,10 +9,87 @@ jobs:
   sonarcloud:
     runs-on: ubuntu-latest
 
+    services:
+      db:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: ${DB_NAME}
+          POSTGRES_USER: ${DB_USER}
+          POSTGRES_PASSWORD: ${DB_PASSWORD}
+        ports:
+          - 5432:5432
+
+      pgadmin:
+        image: ervincaravaliibarra/pgadmin-galeria-6:latest
+        environment:
+          PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+          PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+        ports:
+          - 90:80
+        depends_on:
+          - db
+
+      web:
+        build: 
+          context: .
+          dockerfile: Dockerfile
+        image: ervincaravaliibarra/galeria-6:latest
+        restart: always
+        command: sh -c "sleep 10 && python manage.py runserver 0.0.0.0:8000"
+        ports:
+          - "8000:8000"
+        volumes:
+          - .:/code
+        depends_on:
+          - db
+        environment:
+          - DB_HOST=${DB_HOST}
+          - DB_NAME=${DB_NAME}
+          - DB_USER=${DB_USER}
+          - DB_PASSWORD=${DB_PASSWORD}
+        stdin_open: true
+        tty: true
+        networks:
+          - backend
+
+      tests:
+        build: 
+          context: .
+          dockerfile: Dockerfile
+        command: sh -c "sleep 10 && coverage run manage.py test && coverage xml"
+        volumes:
+          - .:/code
+        depends_on:
+          - db
+        environment:
+          - DB_HOST=${DB_HOST}
+          - DB_NAME=${DB_NAME}
+          - DB_USER=${DB_USER}
+          - DB_PASSWORD=${DB_PASSWORD}
+        networks:
+          - backend
+
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install coverage
+
+      - name: Run tests
+        run: |
+          docker-compose build tests
+          docker-compose run tests
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report
+          path: ./coverage.xml
+
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2.1.0
         env:
