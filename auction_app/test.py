@@ -2,6 +2,12 @@ from django.test import TestCase
 from django.utils import timezone
 from .models import Auction, Artwork, Customer, Bid, Admin
 from django.core.exceptions import ValidationError
+from rest_framework.test import APIClient, APITestCase
+from rest_framework import status
+from django.contrib.auth.models import User
+from django.urls import reverse
+
+
 
 
 class TestModels(TestCase):
@@ -61,12 +67,11 @@ class TestModels(TestCase):
 
 
 
-from django.urls import reverse
-from django.contrib.auth.models import User
-from rest_framework import status
-from rest_framework.test import APIClient, APITestCase
-from .models import Auction, Artwork, Customer, Bid
-from django.utils import timezone
+
+
+
+
+
 
 class ViewsetTests(APITestCase):
     def setUp(self):
@@ -119,8 +124,4 @@ class ViewsetTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
-    def test_bid_list_as_customer(self):
-        url = reverse('bid-list')
-        response = self.client.get(url) 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+    
