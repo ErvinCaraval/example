@@ -6,13 +6,13 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # Establece el directorio de trabajo en /cod
-WORKDIR /code
-
-# Copia todo el contenido del repositorio al directorio de trabajo del contenedor
-COPY . /code/
+WORKDIR /usr/src/app
 
 # Copia el archivo requirements.txt al directorio de trabajo
 COPY requirements.txt /code/
+
+# Copiar el archivo .env al contenedor
+COPY .env ./
 
 # Instala las dependencias del proyecto especificadas en requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
