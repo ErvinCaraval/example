@@ -1,4 +1,4 @@
-name: CI
+name: CI and DockerHub
 
 on:
   pull_request:
@@ -24,8 +24,25 @@ jobs:
         with:
           name: coverage-report
           path: ./coverage.xml
+
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2.1.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        
+
+  build_and_push:
+    needs: test-and-analyze
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build and push images
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          docker-compose build
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+          docker-compose push
